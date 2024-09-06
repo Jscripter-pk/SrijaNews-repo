@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ state, dispatch }) => {
     const apiKey = process.env.NEXT_PUBLIC_NEWS_API_KEY;
     const response = await axios.get("https://newsapi.org/v2/everything", {
       params: {
-        q: `${state.searchQuery} category=${state.category}`,
+        q: `${state.searchQuery || state.category}`,
         apiKey,
       },
     });
