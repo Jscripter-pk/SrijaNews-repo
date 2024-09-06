@@ -115,9 +115,33 @@ export const NewList: React.FC<{ state: State }> = ({ state }) => {
 
       {/* Modal for Filtering */}
       {filterModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-md shadow-md max-w-lg w-full">
-            <h3 className="text-xl font-semibold mb-4">Personalize News</h3>
+        <div className="fixed px-3 top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="relative bg-white p-8 rounded-md shadow-md max-w-lg w-full">
+            <button
+              className="absolute top-2 right-2 p-2 bg-gray-800 text-white rounded-full hover:bg-gray-600"
+              aria-label="Close"
+              onClick={() => {
+                setFilterModalOpen(false);
+              }}
+            >
+              <svg
+                className="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+            <h3 className="text-xl font-semibold mb-4">
+              Filter and Personalize News
+            </h3>
 
             {/* Source */}
             <div className="mb-4">
@@ -150,7 +174,7 @@ export const NewList: React.FC<{ state: State }> = ({ state }) => {
 
             {/* Date Range */}
             <div className="mb-4">
-              <label className="block text-gray-700">Start Date:</label>
+              <label className="block text-gray-700">From Date:</label>
               <input
                 type="date"
                 className="w-full p-2 border border-gray-300 rounded-md"
@@ -159,7 +183,7 @@ export const NewList: React.FC<{ state: State }> = ({ state }) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">End Date:</label>
+              <label className="block text-gray-700">To Date:</label>
               <input
                 type="date"
                 className="w-full p-2 border border-gray-300 rounded-md"
