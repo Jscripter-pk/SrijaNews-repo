@@ -8,7 +8,7 @@ then
 elif [[ $operation = "decrypt" ]];
 then
     gpg --quiet --batch --yes --decrypt --passphrase="$SECRET_PASSPHRASE" \
-    --output .env.$env .env.$env.gpg
+    --output .env .env.$env.gpg
 else
-    echo "usage: secret.sh [environment] [operation(encrypt|decrypt)]"
+    echo "Usage: secret.sh [environment] [operation (encrypt|decrypt)]"
 fi
