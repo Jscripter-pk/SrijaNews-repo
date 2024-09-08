@@ -45,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({ state, dispatch }) => {
     queryKey: ["news", state.searchQuery, state.category],
     queryFn: fetchNews,
     enabled: !!state.searchQuery || !!state.category,
-    staleTime: 1000 * 60 * 1440,
+    staleTime: 1000 * 60 * 5,
   });
 
   const handleSearch = () => {
@@ -56,12 +56,7 @@ const Header: React.FC<HeaderProps> = ({ state, dispatch }) => {
   const handleCategoryChange = (category: string) => {
     dispatch({ type: "SET_CATEGORY", payload: category });
     dispatch({ type: "SET_SEARCH", payload: "" });
-  };
-
-  const handleReset = () => {
     setSearchInputText("");
-    dispatch({ type: "SET_SEARCH", payload: "" });
-    dispatch({ type: "SET_CATEGORY", payload: "general" });
   };
 
   return (
@@ -110,13 +105,6 @@ const Header: React.FC<HeaderProps> = ({ state, dispatch }) => {
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
             </button>
           ))}
-          {/* Reset Button */}
-          <button
-            onClick={handleReset}
-            className="px-3 py-1.5 rounded-full text-sm bg-red-500 text-white border border-red-600 hover:bg-red-600 transition-colors"
-          >
-            Reset
-          </button>
         </nav>
       </div>
 
