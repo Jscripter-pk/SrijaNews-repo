@@ -13,13 +13,31 @@ const Header: React.FC<HeaderProps> = ({ state, dispatch }) => {
   const [searchInputText, setSearchInputText] = useState("");
 
   const fetchNews = async () => {
-    const apiKey = process.env.NEXT_PUBLIC_NEWS_API_KEY;
-    const response = await axios.get("https://newsapi.org/v2/everything", {
-      params: {
-        q: `${state.searchQuery || state.category}`,
-        apiKey,
-      },
-    });
+    const apiKey = process.env.NEXT_PUBLIC_NEWS_API_KEY as string;
+
+    const params: {
+      apiKey: string;
+      category: string;
+      q?: string;
+    } = {
+      apiKey,
+      category: state.category,
+    };
+
+    // Only add searchQuery to params if it exists
+    if (state.searchQuery) {
+      params.q = state.searchQuery;
+    }
+
+    const response = await axios.get(
+      `https://newsapi.org/v2/${
+        state.searchQuery ? "everything" : "top-headlines"
+      }`,
+      {
+        params,
+      }
+    );
+
     return response.data.articles;
   };
 
