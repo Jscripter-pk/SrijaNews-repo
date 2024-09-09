@@ -1,8 +1,7 @@
 "use client";
 
-import { State } from "@/app/reducers/filtersReducer";
-import { useIsFetching, useQueryClient } from "@tanstack/react-query";
-import { Key, useEffect, useState } from "react";
+import { InfiniteData } from "@tanstack/react-query";
+import { Key, useEffect, useMemo, useState } from "react";
 import { Loader } from "../Loader";
 
 type ArticleType = {
@@ -17,15 +16,38 @@ type ArticleType = {
   publishedAt: string | number | Date;
 };
 
-export const NewList: React.FC<{ state: State }> = ({ state }) => {
-  const queryClient = useQueryClient();
-  const isFetching = useIsFetching();
+export const NewList: React.FC<{
+  query: {
+    data:
+      | InfiniteData<
+          {
+            articles: ArticleType[];
+            nextPage: number;
+            hasMore: boolean;
+            totalResults: number;
+          },
+          unknown
+        >
+      | undefined;
+    handleLoadMore: () => void;
+    isFetching: boolean;
+    isFetchingNextPage: boolean;
+  };
+}> = ({ query }) => {
+  const {
+    data: queryData,
+    handleLoadMore,
+    isFetching,
+    isFetchingNextPage,
+  } = query;
 
-  const cachedNewsData = queryClient.getQueryData([
-    "news",
-    state?.searchQuery || "",
-    state.category,
-  ]) as ArticleType[];
+  const pagesData = useMemo(
+    () =>
+      queryData?.pages.flatMap(
+        (page: { articles: ArticleType[] }) => page.articles
+      ) || [],
+    [queryData]
+  );
 
   // State for filtering by categories, sources, authors, and date range
   const [filterModalOpen, setFilterModalOpen] = useState(false);
@@ -36,37 +58,37 @@ export const NewList: React.FC<{ state: State }> = ({ state }) => {
   const [articles, setFilteredArticles] = useState<ArticleType[]>();
 
   useEffect(() => {
-    setFilteredArticles(cachedNewsData);
-  }, [cachedNewsData]);
+    setFilteredArticles(pagesData);
+  }, [pagesData]);
 
   // Function to handle filtering the articles based on user preferences
   const filterArticles = () => {
-    let filteredArticles = cachedNewsData;
+    let filteredArticles = pagesData;
 
     if (selectedSource) {
       filteredArticles = filteredArticles?.filter(
-        (article) =>
+        (article: ArticleType) =>
           article.source.name === selectedSource &&
           !article.title?.includes("Removed")
       );
     }
     if (selectedAuthor) {
       filteredArticles = filteredArticles?.filter(
-        (article) =>
+        (article: ArticleType) =>
           article.author === selectedAuthor &&
           !article.title?.includes("Removed")
       );
     }
     if (startDate) {
       filteredArticles = filteredArticles?.filter(
-        (article) =>
+        (article: ArticleType) =>
           new Date(article.publishedAt.toString().slice(0, 10)) >=
             new Date(startDate) && !article.title?.includes("Removed")
       );
     }
     if (endDate) {
       filteredArticles = filteredArticles?.filter(
-        (article) =>
+        (article: ArticleType) =>
           new Date(article.publishedAt.toString().slice(0, 10)) <=
             new Date(endDate) && !article.title?.includes("Removed")
       );
@@ -85,11 +107,11 @@ export const NewList: React.FC<{ state: State }> = ({ state }) => {
     setSelectedAuthor(null);
     setStartDate("");
     setEndDate("");
-    setFilteredArticles(cachedNewsData || []);
+    setFilteredArticles(pagesData || []);
   };
 
   const uniqueSources = Array.from(
-    new Set(cachedNewsData?.map((article) => article.source.name))
+    new Set(pagesData?.map((article: ArticleType) => article.source.name))
   );
 
   return (
@@ -153,8 +175,8 @@ export const NewList: React.FC<{ state: State }> = ({ state }) => {
               >
                 <option value="">All Sources</option>
                 {uniqueSources.map((source) => (
-                  <option key={source} value={source as string}>
-                    {source}
+                  <option key={source as string} value={source as string}>
+                    {source as string}
                   </option>
                 ))}
               </select>
@@ -217,55 +239,96 @@ export const NewList: React.FC<{ state: State }> = ({ state }) => {
         </div>
       )}
 
-      {articles && !isFetching ? (
-        articles.length > 0 ? (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 p-8">
-            {articles.map((article: ArticleType, index: number) => (
-              <li
-                key={`${article.url}-${index}`}
-                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative"
-              >
-                <a href={article.url as string} className="block flex-1">
-                  {article.urlToImage ? (
-                    <div className="relative w-full h-48">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={article.urlToImage}
-                        alt={article.title as string}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 p-2 text-white text-xs">
-                        <div className="flex justify-between">
-                          <span className="italic">{article.source.name}</span>
-                          <span>
-                            {new Date(article.publishedAt).toLocaleDateString()}
-                          </span>
+      {articles &&
+        (articles.length > 0 ? (
+          <>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 p-8">
+              {articles.map((article: ArticleType, index: number) => (
+                <li
+                  key={`${article.url}-${index}`}
+                  className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative"
+                >
+                  <a href={article.url as string} className="block flex-1">
+                    {article.urlToImage ? (
+                      <div className="relative w-full h-48">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={article.urlToImage}
+                          alt={article.title as string}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 p-2 text-white text-xs">
+                          <div className="flex justify-between">
+                            <span className="italic">
+                              {article.source.name}
+                            </span>
+                            <span>
+                              {new Date(
+                                article.publishedAt
+                              ).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
                       </div>
+                    ) : (
+                      <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">
+                        <span>No Image Available</span>
+                      </div>
+                    )}
+                    <div className="p-4 flex flex-col flex-1">
+                      <h3 className="text-lg font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-2 flex-1">
+                        {article.description}
+                      </p>
                     </div>
-                  ) : (
-                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">
-                      <span>No Image Available</span>
-                    </div>
-                  )}
-                  <div className="p-4 flex flex-col flex-1">
-                    <h3 className="text-lg font-semibold text-blue-600 hover:text-blue-800 transition-colors">
-                      {article.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-2 flex-1">
-                      {article.description}
-                    </p>
-                  </div>
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center text-gray-500">No articles found.</p>
-        )
-      ) : (
-        <p>{isFetching ? <Loader /> : "No cached data available"}</p>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {articles?.length < queryData?.pages?.[0]?.totalResults && (
+              <button
+                onClick={() => {
+                  handleLoadMore();
+                }}
+                className="mt-4 mb-4 mx-auto block bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+              >
+                {isFetchingNextPage ? (
+                  <Loader />
+                ) : (
+                  <>
+                    <span>{"Load More"}</span>
+                    <svg
+                      className="w-5 h-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </>
+                )}
+              </button>
+            )}
+          </>
+        ) : null)}
+      {articles && articles.length === 0 && !isFetching && (
+        <div className="flex items-center justify-center h-[60%]">
+          <p className="text-2xl text-gray-500">No News Found</p>
+        </div>
       )}
+      <p>
+        {isFetching && !isFetchingNextPage && articles?.length === 0 && (
+          <Loader />
+        )}
+      </p>
     </div>
   );
 };

@@ -1,6 +1,4 @@
 import React, { Dispatch, useState } from "react";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
 import { Action, State } from "@/app/reducers/filtersReducer";
 import Image from "next/image";
 
@@ -11,42 +9,6 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ state, dispatch }) => {
   const [searchInputText, setSearchInputText] = useState("");
-
-  const fetchNews = async () => {
-    const apiKey = process.env.NEXT_PUBLIC_NEWS_API_KEY as string;
-
-    const params: {
-      apiKey: string;
-      category: string;
-      q?: string;
-    } = {
-      apiKey,
-      category: state.category,
-    };
-
-    // Only add searchQuery to params if it exists
-    if (state.searchQuery) {
-      params.q = state.searchQuery;
-    }
-
-    const response = await axios.get(
-      `https://newsapi.org/v2/${
-        state.searchQuery ? "everything" : "top-headlines"
-      }`,
-      {
-        params,
-      }
-    );
-
-    return response.data.articles;
-  };
-
-  const { isError } = useQuery({
-    queryKey: ["news", state.searchQuery, state.category],
-    queryFn: fetchNews,
-    enabled: !!state.searchQuery || !!state.category,
-    staleTime: 1000 * 60 * 5,
-  });
 
   const handleSearch = () => {
     dispatch({ type: "SET_SEARCH", payload: searchInputText });
@@ -106,11 +68,6 @@ const Header: React.FC<HeaderProps> = ({ state, dispatch }) => {
             </button>
           ))}
         </nav>
-      </div>
-
-      {/* Displaying Error */}
-      <div className="mt-4 text-center">
-        {isError && <p>Failed to fetch articles.</p>}
       </div>
     </header>
   );
