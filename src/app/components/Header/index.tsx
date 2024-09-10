@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ state, dispatch }) => {
   };
 
   return (
-    <header className="bg-blue-800 text-white py-2 pt-4 pb-2  ">
+    <header className="bg-white text-white py-2 pt-4 pb-2 shadow-sm">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
         {/* App Title */}
         <div className="mb-4 md:mb-0 flex-shrink-0 text-center md:text-left rounded-full overflow-hidden">
