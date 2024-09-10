@@ -242,8 +242,51 @@ export const NewList: React.FC<{
       {articles &&
         (articles.length > 0 ? (
           <>
+            <div className="px-[28px] mt-[24px] grid grid-cols-1 md:grid-cols-2 gap-4 gap-x-12 mb-8 w-full">
+              {articles.slice(0, 4).map((article, index) => (
+                <div
+                  key={`${article.url}-${index}`}
+                  className="relative h-[150px] bg-white shadow-lg rounded-lg overflow-hidden flex flex-col lg:flex-row"
+                >
+                  <a
+                    href={article.url as string}
+                    className="flex flex-col lg:flex-row w-full"
+                  >
+                    {article.urlToImage ? (
+                      <div className="relative flex-shrink-0 w-full lg:w-48 h-48 lg:h-auto">
+                        <img
+                          src={article.urlToImage}
+                          alt={article.title as string}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-48 lg:h-auto w-full lg:w-48 bg-gray-300 flex items-center justify-center">
+                        <span className="text-gray-600 text-center">
+                          No Image Available
+                        </span>
+                      </div>
+                    )}
+                    <div className="p-4 flex flex-col justify-between w-full">
+                      <h3 className="text-xl font-semibold text-blue-600">
+                        {article.title}
+                      </h3>
+                      {/* Show description on mobile (small screens) */}
+                      <p className="text-gray-700 mt-2 block lg:hidden">
+                        {article.description}
+                      </p>
+                      <span className="text-sm text-gray-500 italic mt-4">
+                        {article.source.name} -{" "}
+                        {new Date(article.publishedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </a>
+                </div>
+              ))}
+            </div>
+
             <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 p-8">
-              {articles.map((article: ArticleType, index: number) => (
+              {articles.slice(4).map((article: ArticleType, index: number) => (
                 <li
                   key={`${article.url}-${index}`}
                   className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative"
