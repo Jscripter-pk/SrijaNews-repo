@@ -21,5 +21,5 @@ docker build --build-arg SECRET_PASSPHRASE=srijanews -t nextjs-app:latest .
 To run the docker image on port 3000 you have to run the below command and you are good to go with testing it in `http://localhost:3000/`
 
 ```bash
-docker run -p 3000:3000
+docker run -p 3000:3000 nextjs-app:latest
 ```

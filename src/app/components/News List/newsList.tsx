@@ -39,7 +39,8 @@ export const NewList: React.FC<{
     handleLoadMore,
     isFetching,
     isFetchingNextPage,
-  } = query;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } = query as any;
 
   const pagesData = useMemo(
     () =>
