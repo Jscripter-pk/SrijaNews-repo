@@ -12,7 +12,10 @@ export const initialState: State = {
   category: "general",
 };
 
-export const filtersReducer = (state: State, action: Action): State => {
+export const searchAndCategoryReducer = (
+  state: State,
+  action: Action
+): State => {
   switch (action.type) {
     case "SET_SEARCH":
       return { ...state, searchQuery: action.payload };

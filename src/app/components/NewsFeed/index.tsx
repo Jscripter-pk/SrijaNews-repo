@@ -1,4 +1,7 @@
-import { filtersReducer, initialState } from "@/app/reducers/filtersReducer";
+import {
+  searchAndCategoryReducer,
+  initialState,
+} from "@/app/reducers/searchAndCategoryReducer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useCallback, useReducer } from "react";
@@ -6,7 +9,7 @@ import Header from "../Header";
 import { NewList } from "../News List/newsList";
 
 export const NewsFeed = () => {
-  const [state, dispatch] = useReducer(filtersReducer, initialState);
+  const [state, dispatch] = useReducer(searchAndCategoryReducer, initialState);
 
   const fetchNews = async ({ pageParam = 1 }) => {
     const apiKey = process.env.NEXT_PUBLIC_NEWS_API_KEY as string;

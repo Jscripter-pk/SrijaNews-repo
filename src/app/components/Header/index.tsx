@@ -1,5 +1,5 @@
 import React, { Dispatch, useState } from "react";
-import { Action, State } from "@/app/reducers/filtersReducer";
+import { Action, State } from "@/app/reducers/searchAndCategoryReducer";
 import Image from "next/image";
 
 interface HeaderProps {
